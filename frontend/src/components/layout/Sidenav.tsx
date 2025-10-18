@@ -256,16 +256,30 @@ export default function Sidenav({ color }: SidenavProps) {
 
   return (
     <>
-      <div className="brand" style={{ padding: '24px 16px', textAlign: 'center' }}>
-        <h3 style={{ color: color, margin: 0 }}>BC Migration</h3>
-        <span style={{ fontSize: '12px', color: '#8c8c8c' }}>BigCommerce Tool</span>
+      <div className="brand" style={{ padding: '24px 20px', textAlign: 'left', marginBottom: '8px' }}>
+        <h3 style={{
+          color: '#1890ff',
+          margin: 0,
+          fontSize: '18px',
+          fontWeight: 600,
+          letterSpacing: '-0.5px'
+        }}>BC Migration</h3>
+        <span style={{
+          fontSize: '12px',
+          color: '#8c8c8c',
+          fontWeight: 400
+        }}>BigCommerce Tool</span>
       </div>
-      <hr style={{ margin: '0 16px', border: 'none', borderTop: '1px solid #f0f0f0' }} />
+      <hr style={{ margin: '0', border: 'none', borderTop: '1px solid #f0f0f0' }} />
       <Menu
         theme="light"
         mode="inline"
         selectedKeys={[page]}
         items={menuItems}
+        style={{
+          border: 'none',
+          marginTop: '8px'
+        }}
       />
     </>
   );

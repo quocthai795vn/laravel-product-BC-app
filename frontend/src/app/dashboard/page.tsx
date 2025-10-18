@@ -57,57 +57,63 @@ export default function DashboardPage() {
   return (
     <DashboardLayout>
       <div>
-        <Title level={2}>Dashboard</Title>
-        <Text type="secondary">Welcome back, {user?.name}!</Text>
+        <div style={{ marginBottom: 24 }}>
+          <Title level={2} style={{ marginBottom: 4, fontSize: '24px', fontWeight: 600 }}>Dashboard</Title>
+          <Text type="secondary" style={{ fontSize: '14px' }}>Welcome back, {user?.name}!</Text>
+        </div>
 
-        <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
+        <Row gutter={[24, 24]}>
           <Col xs={24} sm={12} lg={6}>
-            <Card>
+            <Card bordered={false} style={{ background: '#fff' }}>
               <Statistic
                 title="Total Products"
                 value={1234}
-                prefix={<ShoppingOutlined />}
-                valueStyle={{ color: '#3f8600' }}
+                prefix={<ShoppingOutlined style={{ fontSize: '20px' }} />}
+                valueStyle={{ color: '#3f8600', fontSize: '28px', fontWeight: 600 }}
               />
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card>
+            <Card bordered={false} style={{ background: '#fff' }}>
               <Statistic
                 title="Total Customers"
                 value={567}
-                prefix={<UserOutlined />}
-                valueStyle={{ color: '#1890ff' }}
+                prefix={<UserOutlined style={{ fontSize: '20px' }} />}
+                valueStyle={{ color: '#1890ff', fontSize: '28px', fontWeight: 600 }}
               />
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card>
+            <Card bordered={false} style={{ background: '#fff' }}>
               <Statistic
                 title="Total Orders"
                 value={890}
-                prefix={<FileTextOutlined />}
-                valueStyle={{ color: '#cf1322' }}
+                prefix={<FileTextOutlined style={{ fontSize: '20px' }} />}
+                valueStyle={{ color: '#cf1322', fontSize: '28px', fontWeight: 600 }}
               />
             </Card>
           </Col>
           <Col xs={24} sm={12} lg={6}>
-            <Card>
+            <Card bordered={false} style={{ background: '#fff' }}>
               <Statistic
                 title="Revenue"
                 value={45678}
-                prefix={<DollarOutlined />}
+                prefix={<DollarOutlined style={{ fontSize: '20px' }} />}
                 precision={2}
-                valueStyle={{ color: '#faad14' }}
+                valueStyle={{ color: '#faad14', fontSize: '28px', fontWeight: 600 }}
               />
             </Card>
           </Col>
         </Row>
 
-        <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
+        <Row gutter={[24, 24]} style={{ marginTop: 24 }}>
           <Col span={24}>
-            <Card title="Recent Activity">
-              <p>No recent activity to display</p>
+            <Card
+              title={<span style={{ fontSize: '16px', fontWeight: 600 }}>Recent Activity</span>}
+              bordered={false}
+              style={{ background: '#fff' }}
+            >
+              <Text type="secondary">No recent activity to display</Text>
             </Card>
           </Col>
         </Row>

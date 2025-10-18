@@ -1,25 +1,27 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: #f0f2f5;
+  --foreground: #141414;
+  --primary: #1890ff;
+  --text-color: rgba(0, 0, 0, 0.85);
+  --text-secondary: rgba(0, 0, 0, 0.45);
+  --border-color: #f0f0f0;
 }
 
 html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
+  height: 100%;
 }
 
 body {
-  color: var(--foreground);
+  color: var(--text-color);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5715;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -33,10 +35,104 @@ body {
 a {
   color: inherit;
   text-decoration: none;
+  transition: color 0.3s;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+a:hover {
+  color: var(--primary);
+}
+
+/* Ant Design overrides */
+.ant-layout {
+  background: var(--background);
+}
+
+.ant-layout-sider {
+  background: #fff;
+}
+
+.content-ant {
+  padding: 24px;
+  background: var(--background);
+  min-height: 100vh;
+}
+
+/* Menu styles */
+.ant-menu-item-selected {
+  background-color: #e6f7ff !important;
+}
+
+.ant-menu-item {
+  font-weight: 500;
+}
+
+/* Card styles */
+.ant-card {
+  border-radius: 8px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+}
+
+.ant-card-head {
+  font-weight: 600;
+}
+
+/* Table styles */
+.ant-table {
+  font-size: 14px;
+}
+
+.ant-table-thead > tr > th {
+  background: #fafafa;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+/* Button styles */
+.ant-btn {
+  font-weight: 500;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.02);
+}
+
+.ant-btn-primary {
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.043);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.ant-typography {
+  color: var(--text-color);
+}
+
+/* Statistic styles */
+.ant-statistic-title {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.45);
+  font-weight: 500;
+}
+
+.ant-statistic-content {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* Input styles */
+.ant-input,
+.ant-input-number,
+.ant-picker {
+  border-radius: 6px;
+}
+
+/* Select styles */
+.ant-select-selector {
+  border-radius: 6px !important;
+}
+
+/* Tag styles */
+.ant-tag {
+  border-radius: 4px;
+  font-weight: 500;
 }
