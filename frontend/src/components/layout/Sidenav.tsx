@@ -21,7 +21,7 @@ export default function Sidenav({ color }: SidenavProps) {
       try {
         const user = JSON.parse(userStr);
         setIsAdmin(user.role === 'admin');
-      } catch (e) {
+      } catch {
         setIsAdmin(false);
       }
     }
