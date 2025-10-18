@@ -25,5 +25,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/approve/{id}', [AdminController::class, 'approveUser']);
         Route::get('/users', [AdminController::class, 'listAllUsers']);
         Route::post('/reject/{id}', [AdminController::class, 'rejectUser']);
+        Route::put('/users/{id}', [AdminController::class, 'updateUser']);
+        Route::delete('/users/{id}', [AdminController::class, 'deleteUser']);
     });
 });

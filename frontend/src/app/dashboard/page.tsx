@@ -22,10 +22,6 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    fetchUser();
-  }, []);
-
   const fetchUser = async () => {
     try {
       const token = localStorage.getItem('auth_token');
@@ -36,13 +32,18 @@ export default function DashboardPage() {
 
       const response = await axiosInstance.get('/user');
       setUser(response.data.user);
-    } catch (error: any) {
+    } catch {
       message.error('Failed to fetch user data');
       router.push('/login');
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (loading) {
     return (

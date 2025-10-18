@@ -151,4 +151,96 @@ class AdminController extends Controller
             ],
         ], 200);
     }
+
+    /**
+     * Update a user
+     * PUT /api/admin/users/{id}
+     * Protected route (requires auth:sanctum and admin role)
+     *
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function updateUser(Request $request, $id)
+    {
+        // Check if authenticated user is an admin
+        if ($request->user()->role !== 'admin') {
+            return response()->json([
+                'message' => 'Unauthorized. Admin access required.',
+            ], 403);
+        }
+
+        // Find the user by ID
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found.',
+            ], 404);
+        }
+
+        // Validate the request data
+        $validated = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'email' => 'sometimes|required|email|unique:users,email,' . $id,
+            'role' => 'sometimes|required|in:user,admin',
+            'status' => 'sometimes|required|in:active,pending,inactive',
+        ]);
+
+        // Update user with validated data
+        $user->update($validated);
+
+        return response()->json([
+            'message' => 'User updated successfully.',
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'status' => $user->status,
+            ],
+        ], 200);
+    }
+
+    /**
+     * Delete a user
+     * DELETE /api/admin/users/{id}
+     * Protected route (requires auth:sanctum and admin role)
+     *
+     * @param Request $request
+     * @param int $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deleteUser(Request $request, $id)
+    {
+        // Check if authenticated user is an admin
+        if ($request->user()->role !== 'admin') {
+            return response()->json([
+                'message' => 'Unauthorized. Admin access required.',
+            ], 403);
+        }
+
+        // Prevent admin from deleting themselves
+        if ($request->user()->id == $id) {
+            return response()->json([
+                'message' => 'You cannot delete your own account.',
+            ], 400);
+        }
+
+        // Find the user by ID
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'User not found.',
+            ], 404);
+        }
+
+        // Delete the user
+        $user->delete();
+
+        return response()->json([
+            'message' => 'User deleted successfully.',
+        ], 200);
+    }
 }

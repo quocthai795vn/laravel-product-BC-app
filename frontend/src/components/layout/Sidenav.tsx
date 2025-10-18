@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Menu } from 'antd';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -12,6 +12,20 @@ interface SidenavProps {
 export default function Sidenav({ color }: SidenavProps) {
   const pathname = usePathname();
   const page = pathname?.replace('/', '') || 'dashboard';
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    // Check if user is admin
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        setIsAdmin(user.role === 'admin');
+      } catch (e) {
+        setIsAdmin(false);
+      }
+    }
+  }, []);
 
   const getDashboardIcon = (isActive: boolean) => (
     <svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -102,6 +116,17 @@ export default function Sidenav({ color }: SidenavProps) {
         fillRule="evenodd"
         clipRule="evenodd"
         d="M2 5C2 3.89543 2.89543 3 4 3H16C17.1046 3 18 3.89543 18 5V15C18 16.1046 17.1046 17 16 17H4C2.89543 17 2 16.1046 2 15V5ZM5 7C5 6.44772 5.44772 6 6 6H14C14.5523 6 15 6.44772 15 7C15 7.55228 14.5523 8 14 8H6C5.44772 8 5 7.55228 5 7ZM6 10C5.44772 10 5 10.4477 5 11C5 11.5523 5.44772 12 6 12H10C10.5523 12 11 11.5523 11 11C11 10.4477 10.5523 10 10 10H6Z"
+        fill={isActive ? '#fff' : color}
+      />
+    </svg>
+  );
+
+  const getProfileIcon = (isActive: boolean) => (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M18 10C18 14.4183 14.4183 18 10 18C5.58172 18 2 14.4183 2 10C2 5.58172 5.58172 2 10 2C14.4183 2 18 5.58172 18 10ZM12 7C12 8.10457 11.1046 9 10 9C8.89543 9 8 8.10457 8 7C8 5.89543 8.89543 5 10 5C11.1046 5 12 5.89543 12 7ZM9.99993 11C7.98239 11 6.24394 12.195 5.45374 13.9157C6.55403 15.192 8.18265 16 9.99998 16C11.8173 16 13.4459 15.1921 14.5462 13.9158C13.756 12.195 12.0175 11 9.99993 11Z"
         fill={isActive ? '#fff' : color}
       />
     </svg>
@@ -253,6 +278,34 @@ export default function Sidenav({ color }: SidenavProps) {
       ),
     },
   ];
+
+  // Add Profile menu item only for admin users
+  if (isAdmin) {
+    menuItems.push({
+      key: 'profile',
+      label: (
+        <Link href="/profile" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
+          <span
+            className="icon"
+            style={{
+              background: page === 'profile' ? color : 'rgba(0,0,0,0.04)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '32px',
+              height: '32px',
+              borderRadius: '8px',
+              marginRight: '12px',
+              flexShrink: 0,
+            }}
+          >
+            {getProfileIcon(page === 'profile')}
+          </span>
+          <span className="label">Profile</span>
+        </Link>
+      ),
+    });
+  }
 
   return (
     <>

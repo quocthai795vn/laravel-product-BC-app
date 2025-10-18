@@ -3,9 +3,8 @@
 import React, { useState } from 'react';
 import { Layout, Drawer } from 'antd';
 import Sidenav from './Sidenav';
-import { usePathname } from 'next/navigation';
 
-const { Header: AntHeader, Content, Sider } = Layout;
+const { Content, Sider } = Layout;
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -15,9 +14,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [visible, setVisible] = useState(false);
   const [sidenavColor] = useState('#1890ff');
   const [sidenavType] = useState('transparent');
-  const pathname = usePathname();
-
-  const openDrawer = () => setVisible(!visible);
 
   return (
     <Layout className="layout-dashboard" style={{ minHeight: '100vh' }}>

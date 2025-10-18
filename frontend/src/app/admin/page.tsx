@@ -44,12 +44,6 @@ export default function AdminPage() {
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    checkAdminAccess();
-    fetchPendingUsers();
-    fetchAllUsers();
-  }, []);
-
   const checkAdminAccess = async () => {
     try {
       const token = localStorage.getItem('auth_token');
@@ -68,7 +62,7 @@ export default function AdminPage() {
       }
 
       setCurrentUser(user);
-    } catch (error: any) {
+    } catch {
       message.error('Failed to verify admin access');
       router.push('/login');
     }
@@ -78,7 +72,7 @@ export default function AdminPage() {
     try {
       const response = await axiosInstance.get('/admin/pending');
       setPendingUsers(response.data.users);
-    } catch (error: any) {
+    } catch {
       message.error('Failed to fetch pending users');
     } finally {
       setLoading(false);
@@ -89,10 +83,17 @@ export default function AdminPage() {
     try {
       const response = await axiosInstance.get('/admin/users');
       setAllUsers(response.data.users);
-    } catch (error: any) {
+    } catch {
       message.error('Failed to fetch users');
     }
   };
+
+  useEffect(() => {
+    checkAdminAccess();
+    fetchPendingUsers();
+    fetchAllUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleApprove = async (userId: number) => {
     setActionLoading(userId);
@@ -103,8 +104,8 @@ export default function AdminPage() {
       // Refresh lists
       await fetchPendingUsers();
       await fetchAllUsers();
-    } catch (error: any) {
-      message.error(error.response?.data?.message || 'Failed to approve user');
+    } catch {
+      message.error('Failed to approve user');
     } finally {
       setActionLoading(null);
     }
@@ -119,8 +120,8 @@ export default function AdminPage() {
       // Refresh lists
       await fetchPendingUsers();
       await fetchAllUsers();
-    } catch (error: any) {
-      message.error(error.response?.data?.message || 'Failed to reject user');
+    } catch {
+      message.error('Failed to reject user');
     } finally {
       setActionLoading(null);
     }
@@ -133,7 +134,7 @@ export default function AdminPage() {
       localStorage.removeItem('user');
       message.success('Logged out successfully');
       router.push('/login');
-    } catch (error: any) {
+    } catch {
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user');
       router.push('/login');
