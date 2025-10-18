@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Card, Typography, Button, message, Space, Layout, Avatar } from 'antd';
-import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
+import { Card, Typography, Row, Col, Statistic, message } from 'antd';
+import { ShoppingOutlined, UserOutlined, FileTextOutlined, DollarOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import axiosInstance from '@/lib/axios';
+import DashboardLayout from '@/components/layout/DashboardLayout';
 
-const { Title, Text, Paragraph } = Typography;
-const { Header, Content } = Layout;
+const { Title, Text } = Typography;
 
 interface User {
   id: number;
@@ -28,14 +28,12 @@ export default function DashboardPage() {
 
   const fetchUser = async () => {
     try {
-      // Check if token exists
       const token = localStorage.getItem('auth_token');
       if (!token) {
         router.push('/login');
         return;
       }
 
-      // Fetch user data from Laravel API
       const response = await axiosInstance.get('/user');
       setUser(response.data.user);
     } catch (error: any) {
@@ -46,126 +44,74 @@ export default function DashboardPage() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      // Call logout API to revoke token
-      await axiosInstance.post('/logout');
-
-      // Clear local storage
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('user');
-
-      message.success('Logged out successfully');
-      router.push('/login');
-    } catch (error: any) {
-      // Even if API call fails, clear local storage
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('user');
-      router.push('/login');
-    }
-  };
-
-  const navigateToAdmin = () => {
-    router.push('/admin');
-  };
-
   if (loading) {
     return (
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-      }}>
-        <Text>Loading...</Text>
-      </div>
+      <DashboardLayout>
+        <div style={{ textAlign: 'center', padding: '50px' }}>
+          <Text>Loading...</Text>
+        </div>
+      </DashboardLayout>
     );
   }
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Header style={{
-        background: '#fff',
-        padding: '0 50px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-      }}>
-        <Title level={3} style={{ margin: 0 }}>SaaS App</Title>
-        <Space>
-          <Avatar icon={<UserOutlined />} />
-          <Text strong>{user?.name}</Text>
-          <Button
-            type="primary"
-            danger
-            icon={<LogoutOutlined />}
-            onClick={handleLogout}
-          >
-            Logout
-          </Button>
-        </Space>
-      </Header>
+    <DashboardLayout>
+      <div>
+        <Title level={2}>Dashboard</Title>
+        <Text type="secondary">Welcome back, {user?.name}!</Text>
 
-      <Content style={{ padding: '50px' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-          <Card
-            style={{
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              borderRadius: 8,
-            }}
-          >
-            <Space direction="vertical" size="large" style={{ width: '100%' }}>
-              <div>
-                <Title level={2}>Welcome, {user?.name}! 👋</Title>
-                <Paragraph type="secondary">
-                  You are now logged in to your dashboard.
-                </Paragraph>
-              </div>
+        <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Total Products"
+                value={1234}
+                prefix={<ShoppingOutlined />}
+                valueStyle={{ color: '#3f8600' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Total Customers"
+                value={567}
+                prefix={<UserOutlined />}
+                valueStyle={{ color: '#1890ff' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Total Orders"
+                value={890}
+                prefix={<FileTextOutlined />}
+                valueStyle={{ color: '#cf1322' }}
+              />
+            </Card>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Revenue"
+                value={45678}
+                prefix={<DollarOutlined />}
+                precision={2}
+                valueStyle={{ color: '#faad14' }}
+              />
+            </Card>
+          </Col>
+        </Row>
 
-              <Card type="inner" title="Your Profile Information">
-                <Space direction="vertical" size="middle">
-                  <div>
-                    <Text strong>Name: </Text>
-                    <Text>{user?.name}</Text>
-                  </div>
-                  <div>
-                    <Text strong>Email: </Text>
-                    <Text>{user?.email}</Text>
-                  </div>
-                  <div>
-                    <Text strong>Role: </Text>
-                    <Text>{user?.role}</Text>
-                  </div>
-                  <div>
-                    <Text strong>Status: </Text>
-                    <Text type={user?.status === 'active' ? 'success' : 'warning'}>
-                      {user?.status}
-                    </Text>
-                  </div>
-                </Space>
-              </Card>
-
-              {user?.role === 'admin' && (
-                <Card
-                  type="inner"
-                  title="Admin Actions"
-                  style={{ background: '#f0f5ff' }}
-                >
-                  <Space>
-                    <Button
-                      type="primary"
-                      onClick={navigateToAdmin}
-                    >
-                      Go to Admin Panel
-                    </Button>
-                  </Space>
-                </Card>
-              )}
-            </Space>
-          </Card>
-        </div>
-      </Content>
-    </Layout>
+        <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
+          <Col span={24}>
+            <Card title="Recent Activity">
+              <p>No recent activity to display</p>
+            </Card>
+          </Col>
+        </Row>
+      </div>
+    </DashboardLayout>
   );
 }
