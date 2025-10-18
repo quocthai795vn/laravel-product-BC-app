@@ -1,0 +1,92 @@
+# Laravel Backend
+/backend/vendor/
+/backend/node_modules/
+/backend/.env
+/backend/.env.backup
+/backend/.env.production
+/backend/.phpunit.result.cache
+/backend/Homestead.json
+/backend/Homestead.yaml
+/backend/auth.json
+/backend/npm-debug.log
+/backend/yarn-error.log
+/backend/.idea
+/backend/.vscode
+/backend/storage/*.key
+/backend/storage/app/*
+!/backend/storage/app/.gitignore
+/backend/storage/framework/cache/*
+!/backend/storage/framework/cache/.gitignore
+/backend/storage/framework/sessions/*
+!/backend/storage/framework/sessions/.gitignore
+/backend/storage/framework/testing/*
+!/backend/storage/framework/testing/.gitignore
+/backend/storage/framework/views/*
+!/backend/storage/framework/views/.gitignore
+/backend/storage/logs/*
+!/backend/storage/logs/.gitignore
+/backend/public/hot
+/backend/public/storage
+/backend/bootstrap/cache/*
+!/backend/bootstrap/cache/.gitignore
+
+# Next.js Frontend
+/frontend/.next/
+/frontend/out/
+/frontend/build
+/frontend/dist
+/frontend/node_modules/
+/frontend/.env
+/frontend/.env.local
+/frontend/.env.development.local
+/frontend/.env.test.local
+/frontend/.env.production.local
+/frontend/npm-debug.log*
+/frontend/yarn-debug.log*
+/frontend/yarn-error.log*
+/frontend/.pnpm-debug.log*
+/frontend/.vercel
+/frontend/.idea
+/frontend/.vscode
+
+# Docker files
+docker-compose.yml
+docker-compose.*.yml
+Dockerfile
+.dockerignore
+/docker/
+/.shared-services/
+docker-apache
+docker-apache-varnish
+docker-compose
+docker-nginx
+docker-nginx-varnish
+docker-elasticsearch.yml
+magento-cloud
+phpstorm-preconfig
+
+# Database
+*.sqlite
+*.sqlite-journal
+/stored/
+
+# OS Files
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+
+# Documentation (optional - remove if you want to keep)
+restart.sh
+
+# Other
+Land-Limited/
+.env_laravel-product-BC-app.local
+composer.json
