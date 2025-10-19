@@ -47,6 +47,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/compare', [CategoryController::class, 'compare']);
         Route::post('/migrate', [CategoryController::class, 'migrate']);
 
+        // Export and Import
+        Route::post('/export', [CategoryController::class, 'export']);
+        Route::post('/import', [CategoryController::class, 'import']);
+
         // Migration logs
         Route::get('/logs', [CategoryController::class, 'logs']);
         Route::get('/logs/{id}', [CategoryController::class, 'showLog']);

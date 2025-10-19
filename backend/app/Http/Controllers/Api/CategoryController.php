@@ -350,4 +350,227 @@ class CategoryController extends Controller
             'log' => new MigrationLogResource($log),
         ]);
     }
+
+    /**
+     * Export categories from a store.
+     */
+    public function export(Request $request): JsonResponse
+    {
+        $request->validate([
+            'store_id' => 'required|integer|exists:store_connections,id',
+            'format' => 'required|in:csv,json',
+        ]);
+
+        $userId = auth()->id() ?? 1;
+        $storeId = $request->input('store_id');
+        $format = $request->input('format');
+
+        $store = StoreConnection::where('user_id', $userId)
+            ->findOrFail($storeId);
+
+        $apiService = new BigCommerceApiService(
+            $store->store_hash,
+            $store->access_token
+        );
+
+        try {
+            // Fetch all categories from the store
+            $categories = $store->tree_id
+                ? $apiService->getCategoriesByTree($store->tree_id)
+                : $apiService->getAllCategories();
+
+            if (empty($categories)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No categories found to export',
+                ], 404);
+            }
+
+            // Generate filename
+            $timestamp = date('Y-m-d');
+            $filename = "{$store->name}_categories_{$timestamp}.{$format}";
+
+            // Return data for frontend to process
+            // Frontend will handle CSV/JSON formatting and download
+            return response()->json([
+                'success' => true,
+                'data' => $categories,
+                'filename' => $filename,
+                'store' => [
+                    'id' => $store->id,
+                    'name' => $store->name,
+                    'store_hash' => $store->store_hash,
+                ],
+                'export_info' => [
+                    'total_categories' => count($categories),
+                    'export_date' => now()->toIso8601String(),
+                    'format' => $format,
+                ],
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to export categories',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Import categories into a store.
+     */
+    public function import(Request $request): JsonResponse
+    {
+        $request->validate([
+            'store_id' => 'required|integer|exists:store_connections,id',
+            'categories' => 'required|array|min:1',
+            'categories.*.name' => 'required|string',
+            'categories.*.parent_id' => 'nullable|integer',
+            'categories.*.description' => 'nullable|string',
+            'categories.*.sort_order' => 'nullable|integer',
+            'categories.*.page_title' => 'nullable|string',
+            'categories.*.meta_keywords' => 'nullable',
+            'categories.*.meta_description' => 'nullable|string',
+            'categories.*.search_keywords' => 'nullable|string',
+            'categories.*.custom_url' => 'nullable|string',
+            'categories.*.image_url' => 'nullable|string',
+            'categories.*.is_visible' => 'nullable|boolean',
+            'categories.*.default_product_sort' => 'nullable|string',
+            'categories.*.layout_file' => 'nullable|string',
+        ]);
+
+        $userId = auth()->id() ?? 1;
+        $storeId = $request->input('store_id');
+        $categories = $request->input('categories');
+
+        $store = StoreConnection::where('user_id', $userId)
+            ->findOrFail($storeId);
+
+        $apiService = new BigCommerceApiService(
+            $store->store_hash,
+            $store->access_token
+        );
+
+        try {
+            $results = [
+                'created' => 0,
+                'updated' => 0,
+                'failed' => 0,
+                'details' => [],
+            ];
+
+            // Map old IDs to new IDs for parent references
+            $idMapping = [];
+
+            // Sort categories by parent_id to ensure parents are created first
+            usort($categories, function ($a, $b) {
+                $aParent = $a['parent_id'] ?? 0;
+                $bParent = $b['parent_id'] ?? 0;
+                return $aParent <=> $bParent;
+            });
+
+            foreach ($categories as $category) {
+                try {
+                    $oldId = $category['id'] ?? null;
+                    $parentId = $category['parent_id'] ?? 0;
+
+                    // Remap parent_id if it was in the import
+                    if ($parentId > 0 && isset($idMapping[$parentId])) {
+                        $parentId = $idMapping[$parentId];
+                    }
+
+                    // Prepare category data for BigCommerce API
+                    $categoryData = [
+                        'name' => $category['name'],
+                        'parent_id' => $parentId,
+                        'description' => $category['description'] ?? '',
+                        'sort_order' => $category['sort_order'] ?? 0,
+                        'page_title' => $category['page_title'] ?? '',
+                        'meta_description' => $category['meta_description'] ?? '',
+                        'search_keywords' => $category['search_keywords'] ?? '',
+                        'is_visible' => $category['is_visible'] ?? true,
+                        'default_product_sort' => $category['default_product_sort'] ?? 'use_store_settings',
+                    ];
+
+                    // Handle meta_keywords (can be array or string)
+                    if (isset($category['meta_keywords'])) {
+                        if (is_array($category['meta_keywords'])) {
+                            $categoryData['meta_keywords'] = $category['meta_keywords'];
+                        } else {
+                            $categoryData['meta_keywords'] = array_filter(
+                                array_map('trim', explode(',', $category['meta_keywords']))
+                            );
+                        }
+                    }
+
+                    // Handle custom_url
+                    if (isset($category['custom_url']) && !empty($category['custom_url'])) {
+                        $categoryData['custom_url'] = [
+                            'url' => $category['custom_url'],
+                            'is_customized' => true,
+                        ];
+                    }
+
+                    // Handle image_url
+                    if (isset($category['image_url']) && !empty($category['image_url'])) {
+                        $categoryData['image_url'] = $category['image_url'];
+                    }
+
+                    // Handle layout_file
+                    if (isset($category['layout_file']) && !empty($category['layout_file'])) {
+                        $categoryData['layout_file'] = $category['layout_file'];
+                    }
+
+                    // Create category via BigCommerce API
+                    $createdCategory = $apiService->createCategory($categoryData, $store->tree_id);
+
+                    // Store ID mapping
+                    if ($oldId && isset($createdCategory['id'])) {
+                        $idMapping[$oldId] = $createdCategory['id'];
+                    }
+
+                    $results['created']++;
+                    $results['details'][] = [
+                        'status' => 'success',
+                        'category_name' => $category['name'],
+                        'category_id' => $createdCategory['id'] ?? null,
+                        'old_id' => $oldId,
+                        'message' => 'Created successfully',
+                    ];
+
+                    // Rate limiting: sleep for 500ms
+                    usleep(500000);
+
+                } catch (\Exception $e) {
+                    $results['failed']++;
+                    $results['details'][] = [
+                        'status' => 'failed',
+                        'category_name' => $category['name'],
+                        'old_id' => $oldId ?? null,
+                        'message' => $e->getMessage(),
+                    ];
+                }
+            }
+
+            $message = "Import completed. Created: {$results['created']}, Failed: {$results['failed']}";
+
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'results' => $results,
+                'store' => [
+                    'id' => $store->id,
+                    'name' => $store->name,
+                ],
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Import failed',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

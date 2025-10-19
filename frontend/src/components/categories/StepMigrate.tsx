@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Typography, Button, Space, Divider, Result, Alert } from 'antd';
+import { Typography, Button, Divider, Result, Alert } from 'antd';
 import { RocketOutlined } from '@ant-design/icons';
 import MigrationProgress from './MigrationProgress';
 import { useMigration } from '@/hooks';
