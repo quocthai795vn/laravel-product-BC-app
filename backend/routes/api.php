@@ -35,6 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/stores/{id}', [BigCommerceController::class, 'destroy']);
         Route::post('/stores/{id}/test', [BigCommerceController::class, 'testConnection']);
         Route::get('/stores/{id}/trees', [BigCommerceController::class, 'getCategoryTrees']);
+        Route::post('/stores/test-and-get-trees', [BigCommerceController::class, 'testAndGetTrees']);
     });
 
     // Category Migration routes

@@ -181,4 +181,52 @@ class BigCommerceController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Test connection and get category trees in one call.
+     */
+    public function testAndGetTrees(Request $request): JsonResponse
+    {
+        $request->validate([
+            'store_hash' => 'required|string',
+            'access_token' => 'required|string',
+        ]);
+
+        $apiService = new BigCommerceApiService(
+            $request->input('store_hash'),
+            $request->input('access_token')
+        );
+
+        try {
+            // Test connection first
+            $connectionTest = $apiService->testConnection();
+
+            if (!$connectionTest['success']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Connection test failed',
+                    'error' => $connectionTest['error'] ?? 'Unknown error',
+                ], 422);
+            }
+
+            // Get category trees
+            $trees = $apiService->getCategoryTrees();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Connection successful',
+                'store_info' => [
+                    'store_name' => $connectionTest['store_name'],
+                    'store_url' => $connectionTest['store_url'],
+                ],
+                'trees' => $trees,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to connect or fetch trees',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
